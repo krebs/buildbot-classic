@@ -381,12 +381,9 @@ else:
         ]
 
     setup_args['install_requires'] += [
-        # sqlalchemy-0.8 betas show issues with sqlalchemy-0.7.2, so stick to 0.7.10
-        'sqlalchemy >= 0.6, <= 0.7.10',
-        # buildbot depends on sqlalchemy internals, and this is the tested
-        # version.
-        'sqlalchemy-migrate==0.7.2',
-        'python-dateutil>=1.5',
+        'sqlalchemy >= 0.6',
+        'sqlalchemy-migrate >= 0.7.2',
+        'python-dateutil >= 1.5',
     ]
     setup_args['tests_require'] = [
         'mock',
