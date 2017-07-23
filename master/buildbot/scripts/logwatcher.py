@@ -60,6 +60,7 @@ class LogWatcher(LineOnlyReceiver):
         self.timer = None
 
     def start(self):
+        from distutils.spawn import find_executable
         # If the log file doesn't exist, create it now.
         if not os.path.exists(self.logfile):
             open(self.logfile, 'a').close()
@@ -69,10 +70,8 @@ class LogWatcher(LineOnlyReceiver):
         # been seen within 10 seconds, and with ReconfigError if the error
         # line was seen. If the logfile could not be opened, it errbacks with
         # an IOError.
-        if platform.system().lower() == 'sunos' and os.path.exists('/usr/xpg4/bin/tail'):
-            tailBin = "/usr/xpg4/bin/tail"
-        else:
-            tailBin = "/usr/bin/tail"
+        tailBin = find_executable("tail")
+        print("tail is at {}".format(tailBin))
         self.p = reactor.spawnProcess(self.pp, tailBin,
                                       ("tail", "-f", "-n", "0", self.logfile),
                                       env=os.environ,
