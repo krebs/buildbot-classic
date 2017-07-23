@@ -122,8 +122,7 @@ class IrcBuildRequest:
     def soon(self):
         del self.timer
         if not self.hasStarted:
-            self.parent.send("The build has been queued, I'll give a shout"
-                             " when it starts")
+            self.parent.send("The build has been queued")
 
     def started(self, s):
         self.hasStarted = True
@@ -131,14 +130,14 @@ class IrcBuildRequest:
             self.timer.cancel()
             del self.timer
         eta = s.getETA()
+        buildurl = self.bot.status.getURLForThing(s)
         if self.useRevisions:
-            response = "build containing revision(s) [%s] forced" % s.getRevisions()
+            response = "build containing revision(s) [%s] forced - %s" % (s.getRevisions(),buildurl)
         else:
-            response = "build #%d forced" % s.getNumber()
+            response = "build #%d forced - %s" % (s.getNumber(),buildurl)
         if eta is not None:
-            response = "build forced [ETA %s]" % self.parent.convertTime(eta)
+            response = "build forced [ETA %s] - %s" % (self.parent.convertTime(eta),buildurl)
         self.parent.send(response)
-        self.parent.send("I'll give a shout when the build finishes")
         d = s.waitUntilFinished()
         d.addCallback(self.parent.watchedBuildFinished)
 
@@ -520,10 +519,10 @@ class IRCContact(base.StatusReceiver):
         results = self.getResultsDescriptionAndColor(b.getResults())
         if self.reportBuild(builder_name, buildnum):
             if self.useRevisions:
-                r = "Hey! build %s containing revision(s) [%s] is complete: %s" % \
+                r = "Build %s containing revision(s) [%s] is complete: %s" % \
                     (builder_name, buildrevs, results[0])
             else:
-                r = "Hey! build %s #%d is complete: %s" % \
+                r = "Build %s #%d is complete: %s" % \
                     (builder_name, buildnum, results[0])
 
             r += ' [%s]' % maybeColorize(" ".join(b.getText()), results[1], self.useColors)
