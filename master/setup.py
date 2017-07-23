@@ -120,7 +120,8 @@ be tracked over time, are more visible, and are therefore easier to
 improve.
 """
 
-scripts = ["bin/buildbot"]
+scripts = []
+
 # sdist is usually run on a non-Windows platform, but the buildslave.bat file
 # still needs to get packaged.
 if 'sdist' in sys.argv or sys.platform == 'win32':
@@ -414,6 +415,8 @@ else:
             'sphinx >= 1.4.4'
         ]
     }
+
+setup_args['entry_points']['console_scripts'] = ['buildbot = buildbot.scripts.runner:run']
 
 setup(**setup_args)
 
