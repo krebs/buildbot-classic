@@ -132,9 +132,9 @@ class IrcBuildRequest:
         eta = s.getETA()
         buildurl = self.bot.status.getURLForThing(s)
         if self.useRevisions:
-            response = "build containing revision(s) [%s] forced - %s" % (s.getRevisions(),buildurl)
+            response = "Build containing revision(s) [%s] forced - %s" % (s.getRevisions(),buildurl)
         else:
-            response = "build #%d forced - %s" % (s.getNumber(),buildurl)
+            response = "Build #%d forced - %s" % (s.getNumber(),buildurl)
         if eta is not None:
             response = "build forced [ETA %s] - %s" % (self.parent.convertTime(eta),buildurl)
         self.parent.send(response)
@@ -446,7 +446,8 @@ class IRCContact(base.StatusReceiver):
     }
 
     def getResultsDescriptionAndColor(self, results):
-        return self.results_descriptions.get(results, ("??", 'RED'))
+        txt,color = self.results_descriptions.get(results, ("??", 'RED'))
+        return maybeColorize(txt, color, self.useColors)
 
     def buildFinished(self, builderName, build, results):
         builder = build.getBuilder()
@@ -462,19 +463,23 @@ class IRCContact(base.StatusReceiver):
         buildnum = build.getNumber()
         buildrevs = build.getRevisions()
 
-        results = self.getResultsDescriptionAndColor(build.getResults())
+        txt = self.getResultsDescriptionAndColor(build.getResults())
         if self.reportBuild(builder_name, buildnum):
+            # build-hosts success: http://build.wolf.r/builders/build-hosts/builds/30
+            # build-hosts failed: hotdog prism wu - http://build.hotdog.r/builders/build-hosts/builds/67
             if self.useRevisions:
-                r = "build containing revision(s) [%s] on %s is complete: %s" % \
-                    (buildrevs, builder_name, results[0])
+                r = "build containing revision(s) [%s] on %s %s:" % \
+                    (buildrevs, builder_name, txt)
             else:
-                r = "build #%d of %s is complete: %s" % \
-                    (buildnum, builder_name, results[0])
+                r = "%s %s: " % (builder_name, txt)
 
-            r += ' [%s]' % maybeColorize(" ".join(build.getText()), results[1], self.useColors)
+            if results == FAILURE:
+                r += " ".join(build.getText()[1:]) + " - "
+
+
             buildurl = self.bot.status.getURLForThing(build)
             if buildurl:
-                r += "  Build details are at %s" % buildurl
+                r += buildurl
 
             if self.bot.showBlameList and build.getResults() != SUCCESS and len(build.changes) != 0:
                 r += '  blamelist: ' + ', '.join(list(set([c.who for c in build.changes])))
@@ -529,7 +534,7 @@ class IRCContact(base.StatusReceiver):
             self.send(r)
             buildurl = self.bot.status.getURLForThing(b)
             if buildurl:
-                self.send("Build details are at %s" % buildurl)
+                self.send(" - %s" % buildurl)
 
     def command_FORCE(self, args, who):
         errReply = "try 'force build [--branch=BRANCH] [--revision=REVISION] [--props=PROP1=VAL1,PROP2=VAL2...]  <WHICH> <REASON>'"
