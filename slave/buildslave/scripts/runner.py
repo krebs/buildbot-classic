@@ -234,7 +234,7 @@ class Options(usage.Options):
 
     def opt_version(self):
         import buildslave
-        print "Buildslave version: %s" % buildslave.version
+        print("Buildslave version: %s" % buildslave.__version__)
         usage.Options.opt_version(self)
 
     def opt_verbose(self):

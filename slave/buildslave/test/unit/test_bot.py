@@ -67,7 +67,7 @@ class TestBot(unittest.TestCase):
         d = self.bot.callRemote("getVersion")
 
         def check(vers):
-            self.assertEqual(vers, buildslave.version)
+            self.assertEqual(vers, buildslave.__version__)
         d.addCallback(check)
         return d
 

@@ -167,7 +167,7 @@ class BuildMaster(config.ReconfigurableServiceMixin, service.MultiService):
         self._already_started = True
 
         log.msg("Starting BuildMaster -- buildbot.version: %s" %
-                buildbot.version)
+                buildbot.__version__)
 
         # Set umask
         if self.umask is not None:

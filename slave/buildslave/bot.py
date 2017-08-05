@@ -329,7 +329,7 @@ class Bot(pb.Referenceable, service.MultiService):
 
     def remote_getVersion(self):
         """Send our version back to the Master"""
-        return buildslave.version
+        return buildslave.__version__
 
     def remote_shutdown(self):
         log.msg("slave shutting down on command from master")
@@ -476,7 +476,7 @@ class BuildSlave(service.MultiService):
         # first, apply all monkeypatches
         monkeypatches.patch_all()
 
-        log.msg("Starting BuildSlave -- version: %s" % buildslave.version)
+        log.msg("Starting BuildSlave -- version: %s" % buildslave.__version__)
 
         self.recordHostname(self.basedir)
         if self.umask is not None:

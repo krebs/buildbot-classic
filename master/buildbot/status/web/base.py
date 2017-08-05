@@ -25,7 +25,7 @@ import urllib
 import urlparse
 
 from buildbot import util
-from buildbot import version
+from buildbot import __version__ as version
 from buildbot.process.properties import Properties
 from buildbot.status import build
 from buildbot.status import builder

@@ -34,7 +34,7 @@ from zope.interface import implements
 from buildbot import config
 from buildbot import interfaces
 from buildbot import util
-from buildbot import version
+from buildbot import __version__ as version
 from buildbot.interfaces import IStatusReceiver
 from buildbot.process.properties import Properties
 from buildbot.sourcestamp import SourceStamp

@@ -69,7 +69,7 @@ class FakeSlaveBuildSlave(pb.Referenceable):
         return {'info': 'here'}
 
     def remote_getVersion(self):
-        return buildbot.version
+        return buildbot.__version__
 
     def remote_getCommands(self):
         return {'x': 1}
