@@ -23,7 +23,7 @@ import glob
 import os
 import sys
 
-from buildbot import version
+from buildbot import __version__ as version
 from distutils.core import setup
 
 from distutils.command.install_data import install_data

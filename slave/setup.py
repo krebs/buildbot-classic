@@ -26,7 +26,7 @@ from distutils.command.install_data import install_data
 from distutils.command.sdist import sdist
 from distutils.core import setup
 
-from buildslave import version
+from buildslave import __version__ as version
 
 scripts = ["bin/buildslave"]
 # sdist is usually run on a non-Windows platform, but the buildslave.bat file
