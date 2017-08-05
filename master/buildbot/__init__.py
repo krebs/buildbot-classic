@@ -34,7 +34,7 @@ except IOError:
     import re
 
     VERSION_MATCH = re.compile(r'\d+\.\d+\.\d+(\w|-)*')
-
+    print("unable to find VERSION file")
     try:
         dir = os.path.dirname(os.path.abspath(__file__))
         p = Popen(['git', 'describe', '--tags', '--always'], cwd=dir,
@@ -45,5 +45,6 @@ except IOError:
             v = VERSION_MATCH.search(out)
             if v:
                 version = v.group()
+        print("found version via git {}".format(version))
     except OSError:
         pass
