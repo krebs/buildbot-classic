@@ -125,18 +125,26 @@ class IrcBuildRequest:
             self.parent.send("The build has been queued")
 
     def started(self, s):
+        """
+        s: BuildStatus
+        """
         self.hasStarted = True
         if self.timer:
             self.timer.cancel()
             del self.timer
         eta = s.getETA()
-        buildurl = self.bot.status.getURLForThing(s)
-        if self.useRevisions:
-            response = "Build containing revision(s) [%s] forced - %s" % (s.getRevisions(),buildurl)
-        else:
-            response = "Build #%d forced - %s" % (s.getNumber(),buildurl)
-        if eta is not None:
-            response = "build forced [ETA %s] - %s" % (self.parent.convertTime(eta),buildurl)
+        buildurl = self.parent.bot.status.getURLForThing(s)
+        try:
+            name = s.getBuilder().getName()
+            response = "{} {}{}{}: {}".format(
+                    name,maybeColorize("Forced","TEAL",self.parent.bot.useColors),
+                    " [{}]".format(s.getRevisions()) if self.useRevisions else "",
+                    " [ETA {}]".format(eta) if eta else "",
+                    buildurl)
+        except Exception as e:
+            self.parent.send("Building Response failed: {}".format(e))
+            raise
+
         self.parent.send(response)
         d = s.waitUntilFinished()
         d.addCallback(self.parent.watchedBuildFinished)
@@ -527,7 +535,7 @@ class IRCContact(base.StatusReceiver):
                 r = "Build %s containing revision(s) [%s] is complete: %s" % \
                     (builder_name, buildrevs, results[0])
             else:
-                r = "Build %s #%d is complete: %s" % \
+                r = "%s complete: %s" % \
                     (builder_name, buildnum, results[0])
 
             r += ' [%s]' % maybeColorize(" ".join(b.getText()), results[1], self.useColors)
