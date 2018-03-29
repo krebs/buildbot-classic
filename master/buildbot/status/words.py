@@ -139,7 +139,7 @@ class IrcBuildRequest:
             response = "{} {}{}{}: {}".format(
                     name,maybeColorize("Forced","TEAL",self.parent.bot.useColors),
                     " [{}]".format(s.getRevisions()) if self.useRevisions else "",
-                    " [ETA {}]".format(eta) if eta else "",
+                    " [ETA {:0.2f}]".format(eta) if eta else "",
                     buildurl)
         except Exception as e:
             self.parent.send("Building Response failed: {}".format(e))
@@ -400,18 +400,20 @@ class IRCContact(base.StatusReceiver):
                 not builder.matchesAnyTag(self.bot.tags)):
             return
 
+        # self.send('[Contact] Builder %s added' % (builderName))
         log.msg('[Contact] Builder %s added' % (builderName))
         builder.subscribe(self)
 
     def builderRemoved(self, builderName):
+        # self.send('[Contact] Builder %s removed' % (builderName))
         log.msg('[Contact] Builder %s removed' % (builderName))
 
     def buildStarted(self, builderName, build):
         builder = build.getBuilder()
         log.msg('[Contact] Builder %r with tags %r started' % (builder, builder.getTags()))
 
+        # we just ignore this tagging shit
         # only notify about builders we are interested in
-
         if (self.bot.tags is not None and
            not builder.matchesAnyTag(self.bot.tags)):
             log.msg('Not notifying for a build with no matching tag')
@@ -473,8 +475,8 @@ class IRCContact(base.StatusReceiver):
 
         txt = self.getResultsDescriptionAndColor(build.getResults())
         if self.reportBuild(builder_name, buildnum):
-            # build-hosts success: http://build.wolf.r/builders/build-hosts/builds/30
-            # build-hosts failed: hotdog prism wu - http://build.hotdog.r/builders/build-hosts/builds/67
+            # build-hosts success: http://build.wolf.r/builders/build-hosts/builds/30 revs: aaabbb
+            # build-hosts failed: hotdog prism wu - http://build.hotdog.r/builders/build-hosts/builds/67 revs: aaabbb
             if self.useRevisions:
                 r = "build containing revision(s) [%s] on %s %s:" % \
                     (buildrevs, builder_name, txt)
@@ -490,7 +492,8 @@ class IRCContact(base.StatusReceiver):
                 r += buildurl
 
             if self.bot.showBlameList and build.getResults() != SUCCESS and len(build.changes) != 0:
-                r += '  blamelist: ' + ', '.join(list(set([c.who for c in build.changes])))
+                r += "  blamelist: " + ", ".join(list(set([c.who for c in build.changes])))
+            r += " revs: {}".format(buildrevs)
 
             self.send(r)
 
@@ -542,7 +545,7 @@ class IRCContact(base.StatusReceiver):
             self.send(r)
             buildurl = self.bot.status.getURLForThing(b)
             if buildurl:
-                self.send(" - %s" % buildurl)
+                self.send(" - {} revs: {}".format(buildurl,buildrevs))
 
     def command_FORCE(self, args, who):
         errReply = "try 'force build [--branch=BRANCH] [--revision=REVISION] [--props=PROP1=VAL1,PROP2=VAL2...]  <WHICH> <REASON>'"
