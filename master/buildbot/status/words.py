@@ -472,6 +472,8 @@ class IRCContact(base.StatusReceiver):
         builder_name = builder.getName()
         buildnum = build.getNumber()
         buildrevs = build.getRevisions()
+        buildbranch = build.getProperties()['branch']
+        if not buildbranch: buildbranch = 'unknown'
 
         txt = self.getResultsDescriptionAndColor(build.getResults())
         if self.reportBuild(builder_name, buildnum):
@@ -493,8 +495,8 @@ class IRCContact(base.StatusReceiver):
 
             if self.bot.showBlameList and build.getResults() != SUCCESS and len(build.changes) != 0:
                 r += "  blamelist: " + ", ".join(list(set([c.who for c in build.changes])))
+            r += " branch: {}".format(buildbranch)
             r += " revs: {}".format(buildrevs)
-
             self.send(r)
 
     def notify_for_finished(self, build):
@@ -531,6 +533,8 @@ class IRCContact(base.StatusReceiver):
         builder_name = builder.getName()
         buildnum = b.getNumber()
         buildrevs = b.getRevisions()
+        buildbranch = b.getProperties()['branch']
+        if not buildbranch: buildbranch = 'unknown'
 
         results = self.getResultsDescriptionAndColor(b.getResults())
         if self.reportBuild(builder_name, buildnum):
@@ -545,7 +549,7 @@ class IRCContact(base.StatusReceiver):
             self.send(r)
             buildurl = self.bot.status.getURLForThing(b)
             if buildurl:
-                self.send(" - {} revs: {}".format(buildurl,buildrevs))
+                self.send(" - {} branch: {} revs: {}".format(buildurl,buildbranch,buildrevs))
 
     def command_FORCE(self, args, who):
         errReply = "try 'force build [--branch=BRANCH] [--revision=REVISION] [--props=PROP1=VAL1,PROP2=VAL2...]  <WHICH> <REASON>'"
