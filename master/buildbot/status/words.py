@@ -473,6 +473,7 @@ class IRCContact(base.StatusReceiver):
         buildnum = build.getNumber()
         buildrevs = build.getRevisions()
         buildbranch = build.getProperties()['branch']
+        buildrepo = build.getProperties()['repository']
         if not buildbranch: buildbranch = 'unknown'
 
         txt = self.getResultsDescriptionAndColor(build.getResults())
@@ -495,6 +496,7 @@ class IRCContact(base.StatusReceiver):
 
             if self.bot.showBlameList and build.getResults() != SUCCESS and len(build.changes) != 0:
                 r += "  blamelist: " + ", ".join(list(set([c.who for c in build.changes])))
+            r += " repo: {}".format(buildrepo)
             r += " branch: {}".format(buildbranch)
             r += " revs: {}".format(buildrevs)
             self.send(r)
