@@ -14,4 +14,4 @@
 # Copyright Buildbot Team Members
 
 # see PEP-8
-__version__ = "0.8.17"
+__version__ = "0.8.18"

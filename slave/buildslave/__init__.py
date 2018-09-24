@@ -19,4 +19,4 @@
 # get a version string. if that also fails, use 'latest'.
 #
 
-__version__ = "0.8.14"
+__version__ = "0.8.18"
