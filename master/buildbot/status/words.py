@@ -422,30 +422,30 @@ class IRCContact(base.StatusReceiver):
         if not self.notify_for('started'):
             return
 
-        if self.useRevisions:
-            r = "build containing revision(s) [%s] on %s started" % \
-                (build.getRevisions(), builder.getName())
-        else:
-            # Abbreviate long lists of changes to simply two
-            # revisions, and the number of additional changes.
-            changes = [str(c.revision) for c in build.getChanges()][:2]
-            changes_str = ""
+        try:
+            builder_name = builder.getName()
+            buildrevs = build.getRevisions()
+            buildbranch = build.getProperties()['branch']
+            buildrepo = build.getProperties()['repository']
 
-            if len(build.getChanges()) > 0:
-                changes_str = "including [%s]" % ', '.join(changes)
+            if not buildbranch: buildbranch = 'unknown'
 
-                if len(build.getChanges()) > 2:
-                    # Append number of truncated changes
-                    changes_str += " and %d more" % (len(build.getChanges()) - 2)
+            if self.useRevisions:
+                r = "build containing revision(s) [%s] on %s started" % \
+                    (build.getRevisions(), builder.getName())
+            else:
+                r = "%s %s: " % (builder_name, maybeColorize('started', 'AQUA_LIGHT', self.useColors))
 
-            r = "build #%d of %s started" % (
-                build.getNumber(),
-                builder.getName())
+            buildurl = self.bot.status.getURLForThing(build)
+            if buildurl:
+                r += buildurl
 
-            if changes_str:
-                r += " (%s)" % changes_str
-
-        self.send(r)
+            r += " repo: {}".format(buildrepo)
+            r += " branch: {}".format(buildbranch)
+            r += " revs: {}".format(buildrevs)
+            self.send(r)
+        except Exception as e:
+            self.send(e)
 
     results_descriptions = {
         SUCCESS: ("Success", 'GREEN'),
